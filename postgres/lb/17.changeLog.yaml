@@ -1,0 +1,18 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-17
+    author: yc-user (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: s_s_id
+        baseTableName: section
+        baseTableSchemaName: swsite
+        constraintName: fksection984630
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: s_id
+        referencedTableName: section
+        referencedTableSchemaName: swsite
+        validate: true

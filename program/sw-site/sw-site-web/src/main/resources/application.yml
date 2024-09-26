@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${SW_SITE_POSTGRESQL_HOST}
+    username: ${SW_SITE_POSTGRESQL_USERNAME}
+    password: ${SW_SITE_POSTGRESQL_PASSWORD}
+    driver-class-name: org.postgresql.Driver

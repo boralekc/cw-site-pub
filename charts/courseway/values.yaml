@@ -1,0 +1,22 @@
+namespace: ""
+courseway:
+  name: ""
+  image: cr.yandex/crp72p8mvca2er9lqnso/courseway:v1.0.19
+  labels:
+    app: ""
+  ports: 8080
+  ingress:
+    host: ""
+
+postgresql:
+  dbname: ""
+  dbhost: ""
+  dbport: ""
+  dbusername: ""
+  dbpassword: ""
+
+clusterissuer:
+  name: ""
+
+secret:
+  name: ""

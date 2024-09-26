@@ -1,0 +1,20 @@
+name: Prod deploy workflow
+
+on:
+    push:
+      tags:
+        - 'v*'
+
+jobs:
+    publish-image:
+        name: "Publish Image"
+        uses: ./.github/workflows/publish_image.yml
+        with:
+            YCR_REGISTRY_ID: ${{ vars.YCR_REGISTRY_ID }}
+        secrets:
+            YC_REGISTRY_JSONKEY: ${{ secrets.YC_REGISTRY_JSONKEY }}
+
+    update_helmchart:
+        name: "Update Helm Chart"
+        needs: publish-image
+        uses: ./.github/workflows/update_helmchart.yml

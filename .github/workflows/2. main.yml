@@ -1,0 +1,195 @@
+name: Dev deploy workflow
+
+on:
+  push:
+    tags:
+      - 'main-pipeline*'
+
+jobs:
+  defectdojo_add_engagement:
+    name: "Publish to defectdojo"
+    uses: ./.github/workflows/defectdojo_add_engagement.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+      DEFECTDOJO_PRODUCTID: ${{ secrets.DEFECTDOJO_PRODUCTID }}
+
+  secret-detection:
+    name: "Secret detection"
+    needs: defectdojo_add_engagement
+    uses: ./.github/workflows/secret-detection.yml
+
+  # kubesec-sast:
+  #   name: "kubesec-sast"
+  #   needs: defectdojo_add_engagement
+  #   uses: ./.github/workflows/kubesec-sast.yml
+  #   with:
+  #     NAME_CLUSTERISSUER: ${{ vars.NAME_CLUSTERISSUER }}
+  #     COURSEWAY_DEV_NAMESPACE: ${{ vars.COURSEWAY_DEV_NAMESPACE }}
+  #     COURSEWAY_PROD_NAMESPACE: ${{ vars.COURSEWAY_PROD_NAMESPACE }}
+  #     APP_NAME: ${{ vars.APP_COURSEWAY_DEV_NAME }}
+  #     APP_HOST: ${{ vars.COURSEWAY_DEV_HOST }}
+  #     COURSEWAY_SECRETSNAME: ${{ vars.COURSEWAY_SECRETSNAME }}
+  #     DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+  #   secrets:
+  #     YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+  #     YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+  #     DB_HOST: ${{ secrets.DB_HOST }}
+  #     DB_NAME: ${{ secrets.DB_NAME_DEV }}
+  #     DB_USER: ${{ secrets.DB_USER }}
+  #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  #     DB_PORT: ${{ secrets.DB_PORT }}
+  #     COURSEWAY_DEV_TOKEN: ${{ secrets.COURSEWAY_DEV_TOKEN }}
+  #     DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+  #     DEFECTDOJO_PRODUCTID: ${{ secrets.DEFECTDOJO_PRODUCTID }}
+
+  semgrep-sast:
+    name: "semgrep-sast"
+    needs: defectdojo_add_engagement
+    uses: ./.github/workflows/semgrep-sast.yml
+  
+  trivy-sca:
+    name: "Trivy-sca"
+    needs: defectdojo_add_engagement
+    uses: ./.github/workflows/trivy-sca.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  app-build:
+    name: "App build"
+    needs: [trivy-sca, secret-detection]
+    uses: ./.github/workflows/app-build.yml
+
+  container-scan:
+    name: "Container scan"
+    needs: app-build
+    uses: ./.github/workflows/container-scan.yml
+
+  clusterissuer-dev:
+    name: "Deploy clusterissuer-courseway-dev"
+    needs: container-scan
+    uses: ./.github/workflows/clusterissuer.yml
+    with:
+      APP_HOST: ${{ vars.COURSEWAY_DEV_HOST }}
+      APP_NAMESPACE: ${{ vars.COURSEWAY_DEV_NAMESPACE }}
+      NAME_CLUSTERISSUER: ${{ vars.NAME_CLUSTERISSUER }}
+      CHART_PATH: ${{ vars.CLUSTERISSUER_CHART_PATH }}
+    secrets:
+      YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+
+  clusterissuer-prod:
+    name: "Deploy clusterissuer-courseway-dev"
+    needs: container-scan
+    uses: ./.github/workflows/clusterissuer.yml
+    with:
+      APP_HOST: ${{ vars.COURSEWAY_PROD_HOST }}
+      APP_NAMESPACE: ${{ vars.COURSEWAY_PROD_NAMESPACE }}
+      NAME_CLUSTERISSUER: ${{ vars.NAME_PROD_CLUSTERISSUER }}
+      CHART_PATH: ${{ vars.CLUSTERISSUER_CHART_PATH }}
+    secrets:
+      YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+
+  courseway-dev:
+    name: "Deploy courseway-dev"
+    needs: clusterissuer-dev
+    uses: ./.github/workflows/app-deploy.yml
+    with:
+      NAME_CLUSTERISSUER: ${{ vars.NAME_CLUSTERISSUER }}
+      COURSEWAY_DEV_NAMESPACE: ${{ vars.COURSEWAY_DEV_NAMESPACE }}
+      COURSEWAY_PROD_NAMESPACE: ${{ vars.COURSEWAY_PROD_NAMESPACE }}
+      APP_NAME: ${{ vars.APP_COURSEWAY_DEV_NAME }}
+      APP_HOST: ${{ vars.COURSEWAY_DEV_HOST }}
+      COURSEWAY_SECRETSNAME: ${{ vars.COURSEWAY_SECRETSNAME }}
+    secrets:
+      YC_SA_JSON_CREDENTIALS: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      YC_FOLDER_ID: ${{ secrets.YC_FOLDER_ID }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_NAME: ${{ secrets.DB_NAME_DEV }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      COURSEWAY_DEV_TOKEN: ${{ secrets.COURSEWAY_DEV_TOKEN }}
+
+  dast-scan:
+    name: "DAST scan"
+    needs: courseway-dev
+    uses: ./.github/workflows/dast-scan.yml
+    with: 
+      APP_HOST: ${{ vars.APP_COURSEWAY_DEV_NAME }}
+
+  push_secret_report:
+    name: Publish Report to DefectDojo
+    needs: secret-detection
+    uses: ./.github/workflows/defectdojo_push_report.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+      REPORT_NAME: results
+      REPORT_PATH: results.json
+      SCAN_TYPE: Gitleaks Scan
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  push_semgrep_sast_report:
+    name: Publish Report to DefectDojo
+    needs: semgrep-sast
+    uses: ./.github/workflows/defectdojo_push_report.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+      REPORT_NAME: semgrep-sast-reports
+      REPORT_PATH: semgrep-results.json
+      SCAN_TYPE: Semgrep JSON Report
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  # push_kubesec_sast_report:
+  #   name: Publish Report to DefectDojo
+  #   needs: kubesec-sast
+  #   uses: ./.github/workflows/defectdojo_push_report.yml
+  #   with: 
+  #     DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+  #     REPORT_PATH: kubesec-sast
+  #     REPORT_NAME: kubesec-sast
+  #     SCAN_TYPE: SARIF
+  #   secrets:
+  #     DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  push_sca_report:
+    name: Publish Report to DefectDojo
+    needs: trivy-sca
+    uses: ./.github/workflows/defectdojo_push_report.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+      REPORT_NAME: trivy-sca-report
+      REPORT_PATH: trivy-sca.json
+      SCAN_TYPE: Trivy Scan
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  push_container-scan_report:
+    name: Publish Report to DefectDojo
+    needs: container-scan
+    uses: ./.github/workflows/defectdojo_push_report.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+      REPORT_NAME: trivy-report
+      REPORT_PATH: trivy-report.json
+      SCAN_TYPE: Trivy Scan
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
+  push_dast_report:
+    name: Publish Report to DefectDojo
+    needs: dast-scan
+    uses: ./.github/workflows/defectdojo_push_report.yml
+    with: 
+      DEFECTDOJO_URL: ${{ vars.DEFECTDOJO_URL }}
+      REPORT_NAME: zap-report
+      REPORT_PATH: zap.xml
+      SCAN_TYPE: ZAP Scan
+    secrets:
+      DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}

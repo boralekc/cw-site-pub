@@ -1,0 +1,81 @@
+######################
+# Windows
+######################
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+
+######################
+# Eclipse
+######################
+
+.classpath
+
+.project
+
+.settings
+
+.metadata
+
+.cache
+
+.externalToolBuilders
+
+
+######################
+# IDEA
+######################
+
+.idea
+
+*.iml
+
+*.ipr
+
+out/
+
+
+######################
+# Common garbage
+
+######################
+*~
+
+*.orig
+
+*.class
+
+
+######################
+# Maven specific
+
+######################
+target
+
+test-output
+*.log
+
+# CMake
+cmake-build-*/
+
+# File-based project format
+*.iws
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+
+

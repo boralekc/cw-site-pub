@@ -1,0 +1,53 @@
+name: Clusterissuer pipeline
+on:
+  workflow_call:
+    inputs:
+      APP_HOST:
+        required: false
+        type: string
+      APP_NAMESPACE:
+        required: false
+        type: string
+      NAME_CLUSTERISSUER:
+        required: false
+        type: string
+      CHART_PATH:
+        required: false
+        type: string
+    secrets:
+      YC_SA_JSON_CREDENTIALS:
+        required: true
+      YC_FOLDER_ID:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install yc cli and login into yandex cloud
+        uses: okar1/yc-cli-install@master
+        with:
+          SA_KEY: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Kubeconfig request
+        run: |
+          yc managed-kubernetes cluster get-credentials --name k8s --folder-id ${{ secrets.YC_FOLDER_ID }} --external --force
+
+      - name: Install clusterissuer
+        run: |
+          helm upgrade --install ${{ inputs.NAME_CLUSTERISSUER }} ${{ inputs.CHART_PATH }} \
+            --kubeconfig "$HOME/.kube/config" \
+            --namespace "${{ inputs.APP_NAMESPACE }}" \
+            --create-namespace \
+            --set installCRDs=true \
+            --set namespace="${{ inputs.APP_NAMESPACE }}" \
+            --set clusterissuer.name="${{ inputs.NAME_CLUSTERISSUER }}" \
+            --set clusterissuer.host="${{ inputs.APP_HOST }}"

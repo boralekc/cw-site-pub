@@ -1,0 +1,18 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-15
+    author: yc-user (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: e_et_type
+        baseTableName: element
+        baseTableSchemaName: swsite
+        constraintName: fkelement675208
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: et_type
+        referencedTableName: elementtype
+        referencedTableSchemaName: swsite
+        validate: true

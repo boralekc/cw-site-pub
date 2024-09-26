@@ -1,0 +1,108 @@
+name: App deploy Workflow
+
+on:
+  workflow_call:
+    inputs:
+      NAME_CLUSTERISSUER:
+        required: true
+        type: string
+      COURSEWAY_DEV_NAMESPACE:
+        required: true
+        type: string
+      COURSEWAY_PROD_NAMESPACE:
+        required: true
+        type: string
+      APP_NAME:
+        required: true
+        type: string
+      APP_HOST:
+        required: true
+        type: string
+      COURSEWAY_SECRETSNAME:
+        required: true
+        type: string
+    secrets:
+      YC_SA_JSON_CREDENTIALS:
+        required: true
+      YC_FOLDER_ID:
+        required: true
+      DB_HOST:
+        required: true
+      DB_NAME:
+        required: true
+      DB_USER:
+        required: true
+      DB_PASSWORD:
+        required: true
+      DB_PORT:
+        required: true
+      COURSEWAY_DEV_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install yc cli and login into yandex cloud
+        uses: okar1/yc-cli-install@master
+        with:
+          SA_KEY: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Install Helm
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Set up kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+
+      - name: Kubeconfig request
+        run: |
+          yc managed-kubernetes cluster get-credentials --name k8s --folder-id ${{ secrets.YC_FOLDER_ID }} --external --force
+
+      - name: Create Namespaces
+        run: |
+          kubectl create namespace ${{ inputs.COURSEWAY_DEV_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create namespace ${{ inputs.COURSEWAY_PROD_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Docker registry secret for dev
+        run: |
+          kubectl -n ${{ inputs.COURSEWAY_DEV_NAMESPACE }} create secret docker-registry ${{ inputs.COURSEWAY_SECRETSNAME }} \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.COURSEWAY_DEV_TOKEN }} \
+            --docker-email=boralekc@gmail.com \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Docker registry secret for prod
+        run: |
+          kubectl -n ${{ inputs.COURSEWAY_PROD_NAMESPACE }} create secret docker-registry ${{ inputs.COURSEWAY_SECRETSNAME }} \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.COURSEWAY_DEV_TOKEN }} \
+            --docker-email=boralekc@gmail.com \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade ${{ inputs.APP_NAME }} ./charts/courseway \
+            --install \
+            --wait \
+            --atomic \
+            --namespace ${{ inputs.COURSEWAY_DEV_NAMESPACE }} \
+            --set namespace=${{ inputs.COURSEWAY_DEV_NAMESPACE }} \
+            --set courseway.name=${{ inputs.APP_NAME }} \
+            --set courseway.labels.app=${{ inputs.APP_NAME }} \
+            --set courseway.ingress.host=${{ inputs.APP_HOST }} \
+            --set postgresql.dbname=${{ secrets.DB_NAME }} \
+            --set postgresql.dbhost=${{ secrets.DB_HOST }} \
+            --set postgresql.dbport=${{ secrets.DB_PORT }} \
+            --set postgresql.dbusername=${{ secrets.DB_USER }} \
+            --set postgresql.dbpassword=${{ secrets.DB_PASSWORD }} \
+            --set clusterissuer.name=${{ inputs.NAME_CLUSTERISSUER }} \
+            --set secret.name=${{ inputs.COURSEWAY_SECRETSNAME }} \

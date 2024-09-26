@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Курс по регулярным выражениям</title>
+  <link href="../ext/css/styles.css" rel="stylesheet">
+</head>
+<body>
+<header class="esd-header fixed-top">
+  <div class="container">
+    <nav class="navbar navbar-expand-sm sticky-top esd-topmenu">
+      <div class="container-fluid">
+        <div><a class="navbar-brand esd-brand" href="/regex">CourseWay Regex</a></div>
+        <button type="button" class="navbar-toggler esd-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list esd-svg-toggle" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"></path>
+          </svg>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="d-flex justify-content-end esd-topmenu-block">
+            <ul class="navbar-nav">
+              <!--li class="nav-item">
+                  <a class="nav-link esd-topmenu-item" href="#">Обучение</a>
+              </li-->
+              <li class="nav-item">
+                <a class="nav-link esd-topmenu-item" href="#">Справочник</a>
+              </li>
+              <!--li class="nav-item">
+                  <a class="nav-link esd-topmenu-item" href="#">Примеры</a>
+              </li-->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+<main class="esd-main">
+  <div class="container">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-6 col-xl-3" th:fragment="article">
+          <div class="card esd-article-header">
+            <img src="../ext/img/small/img-1.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                of the card's content.</p>
+              <a href="article.html" class="btn btn-primary">Go somewhere</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+<footer th:fragment="footer" class="esd-footer fixed-bottom">
+  <div class="container">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 text-center">
+          © 2023 ООО «Е-Софт Девелопмент»
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="../ext/js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

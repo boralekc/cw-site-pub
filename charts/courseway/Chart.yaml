@@ -1,0 +1,9 @@
+apiVersion: v2
+name: courseway
+description: courseway application
+
+type: application
+
+version: v1.0.19
+
+appVersion: v1.0.19

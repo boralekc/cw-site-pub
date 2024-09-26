@@ -1,0 +1,16 @@
+liquibase:
+  namespace: liquibase 
+  imagePullSecrets: dockersecret
+  name: liquibase
+  image: liquibase/liquibase:latest
+  labels:
+    app: liquibase
+  ports: 8080
+  env:
+    postgresql_host: SW_SITE_POSTGRESQL_HOST
+    postgresql_username: SW_SITE_POSTGRESQL_USERNAME
+    postgresql_password: SW_SITE_POSTGRESQL_PASSWORD
+  configMap:
+    pghost: "${PGHOSTPROD}"
+    pguser: "${PGUSER}"
+    pgpassword: "${PGPASSWORD}"

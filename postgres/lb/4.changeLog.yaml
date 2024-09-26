@@ -1,0 +1,61 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-4
+    author: yc-user (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: section_pkey
+            name: s_id
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: s_name
+            type: VARCHAR(30)
+        - column:
+            constraints:
+              nullable: false
+            name: s_slug
+            type: VARCHAR(20)
+        - column:
+            constraints:
+              nullable: false
+            name: s_description
+            type: VARCHAR(1000)
+        - column:
+            constraints:
+              nullable: false
+            name: s_order
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: s_createdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: s_editdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: s_active
+            type: BOOLEAN
+        - column:
+            constraints:
+              nullable: false
+            name: s_t_id
+            type: INTEGER
+        - column:
+            name: s_s_id
+            type: INTEGER
+        schemaName: swsite
+        tableName: section

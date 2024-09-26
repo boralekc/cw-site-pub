@@ -1,0 +1,10 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-7
+    author: yc-user (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: et_name
+        constraintName: elementtype_et_name_key
+        tableName: elementtype
+        schemaName: swsite

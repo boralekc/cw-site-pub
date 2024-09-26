@@ -1,0 +1,10 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-9
+    author: yc-user (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: st_url
+        constraintName: site_st_url_key
+        tableName: site
+        schemaName: swsite

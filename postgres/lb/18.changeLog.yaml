@@ -1,0 +1,18 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-18
+    author: yc-user (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: s_st_id
+        baseTableName: technology
+        baseTableSchemaName: swsite
+        constraintName: fktechnology264974
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: NO ACTION
+        onUpdate: NO ACTION
+        referencedColumnNames: st_id
+        referencedTableName: site
+        referencedTableSchemaName: swsite
+        validate: true

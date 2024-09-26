@@ -1,0 +1,33 @@
+name: Update Helm Chart Version
+
+on:
+  workflow_call:
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+            ref: main
+    
+      - name: Get version from Git tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Set new chart version
+        run: |
+          sed -i "s|^\s*image:.*|  image: cr.yandex/crp72p8mvca2er9lqnso/courseway:${{ env.VERSION }}|" /home/runner/work/cw-site/cw-site/charts/courseway/values.yaml
+          sed -i "s/^version:.*/version: ${{ env.VERSION }}/" ${{ github.workspace }}/charts/courseway/Chart.yaml
+          sed -i "s/^appVersion:.*/appVersion: ${{ env.VERSION }}/" ${{ github.workspace }}/charts/courseway/Chart.yaml
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Update chart version to ${{ env.VERSION }}"
+          git pull
+          git push origin HEAD:main

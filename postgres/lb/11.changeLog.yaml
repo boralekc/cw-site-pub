@@ -1,0 +1,10 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-11
+    author: yc-user (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: t_order
+        constraintName: technology_t_order_key
+        tableName: technology
+        schemaName: swsite

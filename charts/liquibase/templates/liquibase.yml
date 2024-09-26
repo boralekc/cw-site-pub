@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.liquibase.name }}
+  namespace: {{ .Values.liquibase.namespace }}
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.liquibase.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.liquibase.name }}
+    spec:
+      containers:
+      - name: {{ .Values.liquibase.name }}
+        image: {{ .Values.liquibase.image }}
+        ports:
+        - containerPort: 80

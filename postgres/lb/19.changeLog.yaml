@@ -1,0 +1,166 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-19
+    author: yc-user (generated)
+    changes:
+    - insert:  
+        columns:  
+        - column:  
+            name: st_name  
+            value: 'Курс по регулярным выражениям'
+        - column:  
+            name: st_url  
+            value: 'http://courseway.ru/'
+        - column:  
+            name: st_description  
+            value: 'Курс по регулярным выражениям'
+        - column:  
+            name: st_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: st_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: st_active  
+            value: true
+        schemaName: swsite  
+        tableName: site
+
+    - insert:  
+        columns:  
+        - column:  
+            name: t_name  
+            value: 'Регулярные выражения'
+        - column:  
+            name: t_description  
+            value: 'Регулярные выражения'
+        - column:  
+            name: t_slug  
+            value: 'regex'
+        - column:  
+            name: t_order  
+            value: '1'
+        - column:  
+            name: t_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: t_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: t_active  
+            value: true
+        - column:  
+            name: s_st_id  
+            valueComputed: (SELECT MAX(st_id) FROM swsite.site)
+        schemaName: swsite  
+        tableName: technology
+
+    - insert:  
+        columns:  
+        - column:  
+            name: s_name  
+            value: 'Справочник'
+        - column:  
+            name: s_slug  
+            value: 'guide'
+        - column:  
+            name: s_description  
+            value: 'Справочник регулярных выражений'
+        - column:  
+            name: s_order  
+            value: '1'
+        - column:  
+            name: s_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: s_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: s_active  
+            value: true
+        - column:  
+            name: s_t_id  
+            valueComputed: (SELECT MAX(t_id) FROM swsite.technology)
+        - column:  
+            name: s_s_id  
+            value: null
+        schemaName: swsite  
+        tableName: section
+
+    - insert:  
+        columns:  
+        - column:  
+            name: a_name  
+            value: 'Регулярные выражения'
+        - column:  
+            name: a_description  
+            value: 'Что такое регулярные выражения?'
+        - column:  
+            name: a_slug  
+            value: 'regex'
+        - column:  
+            name: a_order  
+            value: 1
+        - column:  
+            name: a_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: a_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: a_active   
+            value: true
+        - column:  
+            name: a_s_id  
+            valueComputed: (SELECT MAX(s_id) FROM swsite.section)
+        schemaName: swsite  
+        tableName: article
+
+    - insert:  
+        columns:  
+        - column:  
+            name: et_type   
+            value: 100
+        - column:  
+            name: et_name  
+            value: 'HTML'
+        - column:  
+            name: et_description  
+            value: 'HTML'
+        - column:  
+            name: et_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: et_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: et_active  
+            value: true  
+        schemaName: swsite  
+        tableName: elementtype
+
+    - insert:  
+        columns:  
+        - column:  
+            name: e_content  
+            value: '{"html": "HTML"}'
+        - column:  
+            name: e_order  
+            value: 1
+        - column:  
+            name: e_createdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: e_editdate  
+            value: '2023-10-01 13:22:41'
+        - column:  
+            name: e_active  
+            value: true
+        - column:  
+            name: e_a_id  
+            valueComputed: (SELECT MAX(a_id) FROM swsite.article)
+        - column:  
+            name: e_et_type  
+            value: 100
+        schemaName: swsite  
+        tableName: element

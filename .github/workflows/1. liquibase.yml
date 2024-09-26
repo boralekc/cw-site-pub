@@ -1,0 +1,71 @@
+name: Liquibase pipeline
+on:
+    push:
+      tags:
+        - 'liquibase-dev*'
+        - 'liquibase-prod*'
+    #   LIQUIBASE_PATH:
+    #     required: true
+    #     type: string
+    # secrets:
+    #   DB_HOST:
+    #     required: true
+    #   DB_NAME:
+    #     required: true
+    #   DB_USER:
+    #     required: true
+    #   DB_PASSWORD:
+    #     required: true
+    #   DB_PORT:
+    #     required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Create directory for PostgreSQL SSL certificate
+        run: mkdir -p ~/.postgresql
+
+      - name: Download PostgreSQL SSL certificate
+        run: wget "https://storage.yandexcloud.net/cloud-certs/CA.pem" --output-document ~/.postgresql/root.crt
+
+      - name: Base64 encode SSL certificate
+        id: encode_cert
+        run: echo "cert=$(base64 -w 0 ~/.postgresql/root.crt)" >> $GITHUB_ENV
+
+      - name: Set database name based on tag
+        id: set_db_name
+        run: |
+          if [[ "${GITHUB_REF##*/}" == liquibase-dev* ]]; then
+            echo "DB_NAME=${{ secrets.DB_NAME_DEV  }}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF##*/}" == liquibase-prod* ]]; then
+            echo "DB_NAME=${{ secrets.DB_NAME_PROD  }}" >> $GITHUB_ENV
+          fi
+
+      - name: Create database schema
+        run: |
+          psql -h ${{ secrets.DB_HOST }} -U ${{ secrets.DB_USER }} -d ${{ env.DB_NAME }} -p ${{ secrets.DB_PORT }} -f ${{ vars.LIQUIBASE_PATH }}/create_schema.sql
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Set up Liquibase
+        uses: liquibase/liquibase-github-action@v4
+        with:
+          operation: update
+          url: "jdbc:postgresql://${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ env.DB_NAME }}"
+          username: ${{ secrets.DB_USER }}
+          password: ${{ secrets.DB_PASSWORD }}
+          classpath: ${{ vars.LIQUIBASE_PATH }}
+          changeLogFile: changeLog.yaml
+        env:
+          JAVA_HOME: ${{ steps.java.outputs.java-home }}

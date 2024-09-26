@@ -1,0 +1,48 @@
+name: App deploy workflow
+
+on:
+  workflow_call:
+    inputs:
+      YCR_REGISTRY_ID:
+        required: true
+        type: string
+    secrets:
+      YC_REGISTRY_JSONKEY:
+        required: true
+
+jobs:
+  publish_app:
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+    
+      - name: IAM Token
+        id: issue-iam-token
+        uses: yc-actions/yc-iam-token@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_REGISTRY_JSONKEY }}
+
+      - name: Set up Crane
+        run: |
+          curl -LO https://github.com/google/go-containerregistry/releases/download/v0.20.1/go-containerregistry_Linux_x86_64.tar.gz
+          tar -xzf go-containerregistry_Linux_x86_64.tar.gz
+          sudo mv crane /usr/local/bin/
+
+      - name: Authenticate with GitHub Container Registry
+        run: |
+          crane auth login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+  
+      - name: Pull Docker image from GitHub Container Registry
+        run: |
+          crane pull ghcr.io/${{ github.repository }}:main courseway.tar
+  
+      - name: Authenticate with Yandex Container Registry
+        run: |
+          echo ${{ steps.issue-iam-token.outputs.token }} | crane auth login --username iam --password-stdin cr.yandex
+  
+      - name: Push Docker image to Yandex Container Registry
+        run: |
+          crane push courseway.tar cr.yandex/${{ inputs.YCR_REGISTRY_ID }}/courseway:${{ github.ref_name }}
+          crane push courseway.tar cr.yandex/${{ inputs.YCR_REGISTRY_ID }}/courseway:latest

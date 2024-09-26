@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Курс по регулярным выражениям</title>
+  <link th:href="@{/ext/css/styles.css}" rel="stylesheet">
+</head>
+<body>
+<header th:replace="~{common/fr-example::header}" class="esd-header fixed-top">
+
+</header>
+<main class="esd-main">
+  <div class="container">
+    <div class="container-fluid">
+      <div class="row">
+        <div th:replace="~{common/fr-example::article}">
+      </div>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{common/fr-example::footer}">
+
+</footer>
+<script th:src="@{/ext/js/bootstrap/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

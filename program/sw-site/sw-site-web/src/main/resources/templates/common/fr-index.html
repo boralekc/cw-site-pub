@@ -1,0 +1,75 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Курс по регулярным выражениям</title>
+    <link th:href="@{/ext/css/styles.css}" rel="stylesheet">
+</head>
+<body>
+<header th:fragment="header" class="esd-header fixed-top">
+    <div class="container">
+        <nav class="navbar navbar-expand-sm sticky-top esd-topmenu">
+            <div class="container-fluid">
+                <div><a class="navbar-brand esd-brand" href="/">CourseWay</a></div>
+                <div><a class="navbar-brand esd-brand" href="regex/article/introduction">Regex</a></div>
+            </div>
+        </nav>
+    </div>
+</header>
+<main class="esd-main">
+    <div class="container">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="esd-article-header"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="pb-2 border-bottom">О сайте</h3>
+                    <p class="fs-5">
+                        Сайт посвящен актуальным практикам разработки программного обеспечения!
+                    </p>
+
+                    <p class="fs-5">
+                        Здесь вы&nbsp;найдете информацию о&nbsp;передовых технологиях и&nbsp;эффективных подходах,
+                        применяемых в&nbsp;мире программирования. Наш сайт создан для того, чтобы помочь уже опытным
+                        разработчикам улучшить свои навыки и&nbsp;быть в&nbsp;курсе последних достижений в&nbsp;индустрии.
+                    </p>
+
+                    <p class="fs-5">
+                        Мы&nbsp;активно работаем над наполнением сайта практическими материалами, такими как статьи,
+                        уроки и&nbsp;руководства, которые затрагивают различные аспекты практической разработки&nbsp;&mdash;
+                        от&nbsp;лучших практик кодирования до&nbsp;современных методов тестирования. Наша команда
+                        стремится предоставить вам только актуальную и&nbsp;полезную информацию.
+                    </p>
+
+                </div>
+                <div class="col-md-6">
+                    <h3 class="pb-2 border-bottom">Новости</h3>
+                    <p class="fs-5">Развернут прототип сайта, посвященного технологиям, применяемым при разработке программного обеспечения. Сайт предоставляет полезную информацию о инструментах и подходах, используемых в области веб-разработки. Этот полезный ресурс предназначен для практического применения, помогая разработчикам находить решения для своих задач, улучшать навыки и быть в курсе последних тенденций в области программирования. </p>
+                    <p>06.08.2023</p>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="esd-article-header"></div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:fragment="footer" class="esd-footer fixed-bottom">
+    <div class="container">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12 text-center">
+                    © 2023 ООО «Е-Софт Девелопмент»
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<script th:src="@{/ext/js/bootstrap/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

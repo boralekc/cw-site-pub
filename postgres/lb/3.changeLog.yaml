@@ -1,0 +1,41 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-3
+    author: yc-user (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: elementtype_pkey
+            name: et_type
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: et_name
+            type: VARCHAR(100)
+        - column:
+            name: et_description
+            type: VARCHAR(1000)
+        - column:
+            constraints:
+              nullable: false
+            name: et_createdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: et_editdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: et_active
+            type: BOOLEAN
+        schemaName: swsite
+        tableName: elementtype

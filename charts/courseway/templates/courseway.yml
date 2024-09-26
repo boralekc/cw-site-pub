@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.courseway.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.courseway.name }}
+  replicas: 1 
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.courseway.name }}
+    spec:
+      containers:
+      - name: {{ .Values.courseway.name }}
+        image: {{ .Values.courseway.image }}
+        ports:
+        - containerPort: {{ .Values.courseway.ports }}
+        env:
+          - name: SW_SITE_POSTGRESQL_HOST
+            value: "{{ .Values.postgresql.dbhost }}"
+          - name: SW_SITE_POSTGRESQL_USERNAME
+            value: "{{ .Values.postgresql.dbusername }}"
+          - name: SW_SITE_POSTGRESQL_PASSWORD
+            value: "{{ .Values.postgresql.dbpassword }}"
+      imagePullSecrets:
+      - name: {{ .Values.secret.name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.courseway.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.courseway.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.courseway.ports }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-nginx
+  namespace: {{ .Values.namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "32k"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "512m"
+    cert-manager.io/cluster-issuer: {{ .Values.clusterissuer.name }}
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:  
+    - hosts:
+        - {{ .Values.courseway.ingress.host }}
+      secretName: tls-secret
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.courseway.ingress.host }}
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Values.courseway.name }}
+              port:
+                number: {{ .Values.courseway.ports }}    

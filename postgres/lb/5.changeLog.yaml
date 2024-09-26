@@ -1,0 +1,46 @@
+databaseChangeLog:
+- changeSet:
+    id: 1696359609003-5
+    author: yc-user (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: site_pkey
+            name: st_id
+            type: INTEGER
+        - column:
+            constraints:
+              nullable: false
+            name: st_name
+            type: VARCHAR(100)
+        - column:
+            constraints:
+              nullable: false
+            name: st_url
+            type: VARCHAR(100)
+        - column:
+            name: st_description
+            type: VARCHAR(1000)
+        - column:
+            constraints:
+              nullable: false
+            name: st_createdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            name: st_editdate
+            type: TIMESTAMP WITHOUT TIME ZONE
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: true
+            name: st_active
+            type: BOOLEAN
+        schemaName: swsite
+        tableName: site
